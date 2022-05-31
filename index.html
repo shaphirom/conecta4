@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conecta4</title>
+    <style>
+        table tr td{
+            padding:30px;
+        }
+        table tr td:hover{
+            background-color: yellow;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div style="height:100px"></div>
+
+
+    <div id="tabla">
+
+    </div>
+
+
+    <div class="circle">
+
+    </div>
+
+    <script>
+
+        let modelo = [
+        [null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null],
+        [null,null,null,null,null,null,null]
+        ]
+
+        
+        let jugadores={
+            gameRed:{
+                color:'red',
+                number:1
+            },
+            gameBlue:{
+                color:'blue',
+                number:2
+            }
+        }
+
+        let maxLimit = 0;
+
+        function changeColor(e){
+            let jugador
+            if(e.target.nodeName  == 'TD'){
+                if (maxLimit % 2 == 0){
+                    jugador = jugadores.gameRed
+                    maxLimit = maxLimit +1
+                }else{
+                    jugador = jugadores.gameBlue
+                    maxLimit = maxLimit +1
+                }
+                console.log(maxLimit)
+                cambiarModelo(e,jugador)
+                limpiar()
+                graficar()
+            }
+        }
+        
+        function cambiarModelo(e,jugador){
+            let td = e.target
+            let tr = e.target.parentElement
+            
+            tr = parseInt(tr.attributes[0].value)
+            td = parseInt(td.attributes[0].value)
+            
+            modelo[tr][td] = 1
+            
+            caida(tr,td,jugador)
+        }
+        function caida(fila,columna, jugador){
+            limiteFila = 6
+            limiteColumna = 7
+
+            if (fila+1 != limiteFila){                
+                while (modelo[fila+1][columna] == null){
+                    try{
+
+                        modelo[fila][columna] = null
+                        fila++
+                        modelo[fila][columna] = jugador.number
+
+                        if(fila+1 == limiteFila){
+                            break
+                        }
+                    }catch(e){
+                        modelo[limiteFila][limiteColumna] = 1
+                    }
+                }
+            }
+
+            verificarGanador(fila,columna)
+            
+        }
+        
+        function graficar(){
+            let tabla = document.getElementById('tabla')
+
+            let tab = document.createElement('tabla')
+            let tabBody = document.createElement('tbody')
+            
+            for(let i = 0; i < 6;i++){
+                let tabRow = document.createElement('tr')
+                tabRow.setAttribute('row',i)
+                modelo[i].forEach((p,index)=>{
+                    let child = document.createElement('td');
+                    child.setAttribute('column',index)
+                    child.style.border = '.5px solid black'
+                    child.style.padding = '20px'
+                    child.style.margin = '10px'
+                    
+                    if(p){
+                        child.style.backgroundColor = 'red'
+                        tabRow.appendChild(child)
+                    }
+                    else{
+                        tabRow.appendChild(child)
+                    }
+                })
+                tabBody.appendChild(tabRow)
+            }
+
+            tabla.appendChild(tabBody)
+        }
+        function limpiar(){
+            let tabla = document.getElementById('tabla')
+            tabla.textContent = ''
+
+        }
+
+        function verificarGanador(fila,columna)
+        {
+            let contador = 1
+            console.log(modelo)
+            //console.log('fila',fila,'columna',columna)
+            
+            //inferior    fila+1    columna
+            //verificarColumna(fila,columna)
+            //verificarFila(fila,columna)
+            //verificarIzquierda(fila,columna)
+
+            
+            
+        }
+
+        function verificarColumna(fila,columna){
+            let cuenta = 0
+            if(!(fila > 2)){
+                
+                while(fila + 1 < 6){
+                    fila++
+                    if(modelo[fila][columna] != null){
+                        cuenta++
+                    }
+                    if(cuenta = 4){
+                        console.log('ganaste columna')
+                        break
+                    }
+                }
+            }
+
+        }
+        
+        function verificarFila(fila,columna){
+            
+            let cuenta = 1
+            //console.log('es mi fila',modelo[fila])
+
+            let indice = modelo[fila].findIndex(element=> element == 1)
+            console.log(indice)
+
+            if(indice <= 3){
+                for(let i = 1; i <= 4; i++){
+                    console.log('soy i',i)
+                    if(modelo[fila][indice+i] == 1){
+                        cuenta++
+                        console.log('cuenta fila',cuenta)
+    
+                        if(cuenta == 4){
+                            console.log('ganaste')
+                        }
+                    }else{
+                        break
+                    }
+                }
+            }
+
+        }
+
+        function verificarIzquierda(fila,columna){
+
+            console.log(fila,columna,modelo[fila][columna])
+
+        }
+
+
+        document.getElementById('tabla').addEventListener('pointerup',changeColor)
+        graficar()        
+    </script>
+    
+
+    <style>
+        table tr td:hover{
+            background-color: yellow;
+        }
+
+    </style>
+    
+</body>
+</html>
