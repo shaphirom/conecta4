@@ -5,220 +5,311 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conecta4</title>
-    <style>
-        table tr td{
-            padding:30px;
-        }
-        table tr td:hover{
-            background-color: yellow;
-        }
-
-    </style>
 </head>
 <body>
 
-    <div style="height:100px"></div>
+    <style>
+        
 
+        td{
+            padding: 30px;
+            border: 2px solid black;
+            border-radius: 50%;
+        }
+        td[tipo='tipo-0']{
+            background-color: white;
+        }
+        td[tipo='tipo-1']{
+            background-color: red;
+        }
+        td[tipo='tipo-2']{
+            background-color: blue;
+        }
+    </style>
+    <hr>
+    <hr>
+    <hr>
+    <hr>
+    <hr>
+    <hr>
+    <hr>
+    <hr>
+    <hr>
+    <hr>
+    <hr>
+    <hr>
+    <hr>
+    <h2 id="victoria"></h2>
+    <table>
+        <tbody id="game">
+    
+        </tbody>
 
-    <div id="tabla">
-
-    </div>
-
-
-    <div class="circle">
-
-    </div>
+    </table>
 
     <script>
-
-        let modelo = [
-        [null,null,null,null,null,null,null],
-        [null,null,null,null,null,null,null],
-        [null,null,null,null,null,null,null],
-        [null,null,null,null,null,null,null],
-        [null,null,null,null,null,null,null],
-        [null,null,null,null,null,null,null]
+        let model = [
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
         ]
 
-        
-        let jugadores={
-            gameRed:{
-                color:'red',
-                number:1
+        let filaCantidad = [6,6,6,6,6,6,6]
+
+        let gamer = {
+            jugador1 : {
+                id : 1
             },
-            gameBlue:{
-                color:'blue',
-                number:2
+            jugador2 : {
+                id : 2
             }
         }
+        let player;
+        let contador = 0
 
-        let maxLimit = 0;
 
-        function changeColor(e){
-            let jugador
-            if(e.target.nodeName  == 'TD'){
-                if (maxLimit % 2 == 0){
-                    jugador = jugadores.gameRed
-                    maxLimit = maxLimit +1
-                }else{
-                    jugador = jugadores.gameBlue
-                    maxLimit = maxLimit +1
-                }
-                console.log(maxLimit)
-                cambiarModelo(e,jugador)
-                limpiar()
-                graficar()
-            }
-        }
-        
-        function cambiarModelo(e,jugador){
-            let td = e.target
-            let tr = e.target.parentElement
-            
-            tr = parseInt(tr.attributes[0].value)
-            td = parseInt(td.attributes[0].value)
-            
-            modelo[tr][td] = 1
-            
-            caida(tr,td,jugador)
-        }
-        function caida(fila,columna, jugador){
-            limiteFila = 6
-            limiteColumna = 7
+        function draw(){
+            let cuerpo = document.getElementById('game')
 
-            if (fila+1 != limiteFila){                
-                while (modelo[fila+1][columna] == null){
-                    try{
+            model.forEach((e,index)=>{
+                let tr = document.createElement('TR')
+                tr.setAttribute('fila',index)
+                e.forEach((d,index)=>{
+                    let td = document.createElement('TD')
+                    td.setAttribute('tipo','tipo-'+d)
+                    td.setAttribute('columna',index)
 
-                        modelo[fila][columna] = null
-                        fila++
-                        modelo[fila][columna] = jugador.number
-
-                        if(fila+1 == limiteFila){
-                            break
-                        }
-                    }catch(e){
-                        modelo[limiteFila][limiteColumna] = 1
-                    }
-                }
-            }
-
-            verificarGanador(fila,columna)
-            
-        }
-        
-        function graficar(){
-            let tabla = document.getElementById('tabla')
-
-            let tab = document.createElement('tabla')
-            let tabBody = document.createElement('tbody')
-            
-            for(let i = 0; i < 6;i++){
-                let tabRow = document.createElement('tr')
-                tabRow.setAttribute('row',i)
-                modelo[i].forEach((p,index)=>{
-                    let child = document.createElement('td');
-                    child.setAttribute('column',index)
-                    child.style.border = '.5px solid black'
-                    child.style.padding = '20px'
-                    child.style.margin = '10px'
-                    
-                    if(p){
-                        child.style.backgroundColor = 'red'
-                        tabRow.appendChild(child)
-                    }
-                    else{
-                        tabRow.appendChild(child)
-                    }
+                    tr.appendChild(td)
                 })
-                tabBody.appendChild(tabRow)
+
+                cuerpo.appendChild(tr)
+
+            })
+        } 
+
+        function clear(){
+            document.getElementById('game').textContent = ''
+        }
+
+
+        function modifyModel(e){
+            verifyPlayer()
+            let columna = e.target.attributes['columna'].nodeValue
+            let fila = e.target.parentElement.attributes['fila'].nodeValue
+            
+            //console.log(columna)
+            //console.log(fila)
+            //console.log('-----------')
+            //console.log(model[fila][columna])
+
+            //if(model[fila][columna] == 1 || model[fila][columna] == 2){
+            //    console.log("No puedes ponerlo ahi")
+            //}            
+            
+            let newfila = filaCantidad[columna] -1
+
+            if(newfila != -1){
+                model[newfila][columna] = player.id
+                verifyWinner(player.id,newfila,columna)
+                filaCantidad[columna] = filaCantidad[columna] -1
+
+
+            }else{
+                alert('No se puede agregar casillas')
             }
-
-            tabla.appendChild(tabBody)
-        }
-        function limpiar(){
-            let tabla = document.getElementById('tabla')
-            tabla.textContent = ''
-
-        }
-
-        function verificarGanador(fila,columna)
-        {
-            let contador = 1
-            console.log(modelo)
-            //console.log('fila',fila,'columna',columna)
+            //columna solo usarla para fisica
             
-            //inferior    fila+1    columna
-            //verificarColumna(fila,columna)
-            //verificarFila(fila,columna)
-            //verificarIzquierda(fila,columna)
-
-            
-            
-        }
-
-        function verificarColumna(fila,columna){
-            let cuenta = 0
-            if(!(fila > 2)){
-                
-                while(fila + 1 < 6){
-                    fila++
-                    if(modelo[fila][columna] != null){
-                        cuenta++
-                    }
-                    if(cuenta = 4){
-                        console.log('ganaste columna')
-                        break
-                    }
-                }
-            }
 
         }
         
-        function verificarFila(fila,columna){
+        function verifyPlayer(){
+
+            contador++ 
+            if(contador % 2 == 0){
+                player = gamer.jugador2
+            }else{
+                player = gamer.jugador1
+            }
             
-            let cuenta = 1
-            //console.log('es mi fila',modelo[fila])
+        }
 
-            let indice = modelo[fila].findIndex(element=> element == 1)
-            console.log(indice)
+        function verifyWinner(p,f,c){
+            let ganador = false
+            f = parseInt(f)
+            c = parseInt(c)
 
-            if(indice <= 3){
-                for(let i = 1; i <= 4; i++){
-                    console.log('soy i',i)
-                    if(modelo[fila][indice+i] == 1){
-                        cuenta++
-                        console.log('cuenta fila',cuenta)
-    
-                        if(cuenta == 4){
-                            console.log('ganaste')
-                        }
-                    }else{
-                        break
-                    }
+            let lista = []
+            
+
+            //ir abajo
+            //l  arriba abajo izquierda derecha
+            //r  abajo arriba izquierda derecha
+            //h horizontal
+            //a abajo
+ 
+
+            try{
+                let r = [model[f][c],model[f-1][c+1],model[f-2][c+2],model[f-3][c+3]]
+                //console.log('l1',r)
+                lista.push(r)
+            }catch(e){}
+            try{
+                let r = [model[f+1][c-1],model[f][c],model[f-1][c+1],model[f-2][c+2]]
+                //console.log('l2',r)
+                lista.push(r)
+            }catch(e){}
+            try{
+                let r = [model[f+2][c-2],model[f+1][c-1],model[f][c],model[f-1][c+1]]
+                //console.log('l3',r)
+                lista.push(r)
+            }catch(e){}
+            try{
+                let r = [model[f+3][c-3],model[f+2][c-2],model[f+1][c-1],model[f][c]]
+                //console.log('l4',r)
+                lista.push(r)
+            }catch(e){}
+            
+            try{
+                let r = [model[f][c],model[f+1][c+1],model[f+2][c+2],model[f+3][c+3]]
+                //console.log('r1',r)
+                lista.push(r)
+            }catch(e){}
+            try{
+                let r = [model[f-1][c-1],model[f][c],model[f+1][c+1],model[f+2][c+2]]
+                //console.log('r2',r)
+                lista.push(r)
+            }catch(e){}
+            try{
+                let r = [model[f-2][c-2],model[f-1][c-1],model[f][c],model[f+1][c+1]]
+                //console.log('r3',r)
+                lista.push(r)
+            }catch(e){}
+            try{
+                let r = [model[f-3][c-3],model[f-2][c-2],model[f-1][c-1],model[f][c]]
+                //console.log('r4',r)
+                lista.push(r)
+            }catch(e){}
+            
+            
+            try{
+                let r = [model[f][c],model[f][c+1],model[f][c+2],model[f][c+3]]
+                //console.log('h1',r)
+                lista.push(r)
+            }catch(e){}
+            try{
+                let r = [model[f][c-1],model[f][c],model[f][c+1],model[f][c+2]]
+                //console.log('h2',r)
+                lista.push(r)
+            }catch(e){}
+            try{
+                let r = [model[f][c-2],model[f][c-1],model[f][c],model[f][c+1]]
+                //console.log('h3',r)
+                lista.push(r)
+            }catch(e){}
+            try{
+                let r = [model[f][c-3],model[f][c-2],model[f][c-1],model[f][c]]
+                //console.log('h4',r)
+                lista.push(r)
+            }catch(e){}
+            
+            try{
+                let r = [model[f][c],model[f+1][c],model[f+2][c],model[f+3][c]]
+                //console.log('a1',r)
+                lista.push(r)
+            }catch(e){}
+            
+            //console.log(lista)
+
+            lista.forEach(e=>{
+               ganar = e.every(c=>c==p)
+
+               if(ganar == true){
+                   ganador = true
+               }
+            })
+
+            if(ganador){
+                let victoria = document.getElementById('victoria')
+
+                if(p == 2){
+                    console.log('Eres un ganador AZUL')
+                    victoria.textContent = "Ganaste AZUL"
+                    
+                }else{
+                    console.log('Eres un ganador ROJO')
+                    victoria.textContent = "Ganaste ROJO"
                 }
+                
+                document.getElementById('game').removeEventListener('click',action)
+
+            }
+
+
+            /*try{
+                let la1 = [model[f][c],model[f-1][c+1],model[f-2][c+2],model[f-3][c+3]]
+                let la2 = [model[f+1][c-1],model[f][c],model[f-1][c+1],model[f-2][c+2]]
+                let la3 = [model[f+2][c-2],model[f+1][c-1],model[f][c],model[f-1][c+1]]
+                let la4 = [model[f+3][c-3],model[f+2][c-2],model[f+1][c-1],model[f][c]]
+                lista = [
+                //lateral abajo arriba
+    
+                    [model[f][c],model[f-1][c+1],model[f-2][c+2],model[f-3][c+3]],
+                    [model[f+1][c-1],model[f][c],model[f-1][c+1],model[f-2][c+2]],
+                    [model[f+2][c-2],model[f+1][c-1],model[f][c],model[f-1][c+1]],
+                    [model[f+3][c-3],model[f+2][c-2],model[f+1][c-1],model[f][c]],
+    
+                // lateral arriba abajo
+                    [model[f][c],model[f+1][c+1],model[f+2][c+2],model[f+3][c+3]],    
+                    [model[f-1][c-1],model[f][c],model[f+1][c+1],model[f+2][c+2]],    
+                    [model[f-2][c-2],model[f-1][c-1],model[f][c],model[f+1][c+1]],    
+                    [model[f-3][c-3],model[f-2][c-2],model[f-1][c-1],model[f][c]],
+                    
+                //izquierda derecha
+                    [model[f][c],model[f][c+1],model[f][c+2],model[f][c+3]],
+                    [model[f][c-1],model[f][c],model[f][c+1],model[f][c+2]],
+                    [model[f][c-2],model[f][c-1],model[f][c],model[f][c+1]],
+                    [model[f][c-3],model[f][c-2],model[f][c-1],model[f][c]],
+    
+                //abajo
+                    [model[f][c],model[f+1][c],model[f+2][c]+model[f+3][c]]
+    
+                    ]
+
+            }catch(e) {
+                console.log('asdas')
+                
+            }*/
+
+
+
+            //verficar hacia abajo si la fila es 2
+            if(f == 2){
+                //verifca abajo
+            }
+
+
+
+            //
+
+
+        }
+
+        draw()
+        function action(e){
+            if(e.target.nodeName == 'TD'){
+                modifyModel(e)
+                clear()
+                draw()
             }
 
         }
-
-        function verificarIzquierda(fila,columna){
-
-            console.log(fila,columna,modelo[fila][columna])
-
-        }
+        document.getElementById('game').addEventListener('click',action);
 
 
-        document.getElementById('tabla').addEventListener('pointerup',changeColor)
-        graficar()        
     </script>
-    
 
-    <style>
-        table tr td:hover{
-            background-color: yellow;
-        }
-
-    </style>
-    
 </body>
 </html>
