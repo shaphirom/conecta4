@@ -23,7 +23,7 @@ Teniendo como punto de parte el modelo y una estructura simple de html que se un
 
 
 ###Graficar/draw
-Usando loop/bucle que recorra el modelo, puedo crear document.createElement de cada <tr>(table row) y otro loop/bucle interno crear un <td>(table data cell)
+Usando loop/bucle que recorra el modelo, puedo crear document.createElement de cada tr(table row) y otro loop/bucle interno crear un td(table data cell)
 
 ###limpiar/clear
 Usando el cuerpo solo hay que usar el textContent = 0
